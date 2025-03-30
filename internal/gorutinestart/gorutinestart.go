@@ -3,7 +3,6 @@ package gorutinestart
 import (
 	"botinfotime/internal/telegrambot"
 	"context"
-	"fmt"
 	"github.com/go-telegram/bot"
 	"time"
 )
@@ -18,19 +17,18 @@ type Gorutinestart struct {
 
 func GorutineStart(ctx context.Context, b *bot.Bot) {
 	go func() {
-		ticker := time.NewTicker(10 * time.Second) // Таймер на 10 секунд
-		defer ticker.Stop()
-
 		for {
 			select {
-			case <-ticker.C:
-				listSurrveyChatID := <-telegrambot.DataChan
-				fmt.Println(listSurrveyChatID)
-				telegrambot.SendBroadcastMessage(ctx, b, listSurrveyChatID)
+			default:
+				if telegrambot.StartSurvey == true {
+					telegrambot.SendBroadcastMessage(ctx, b, telegrambot.ListChatId)
+				}
 			case <-telegrambot.StopChan:
 				// Останавливаем горутину
 				return
 			}
+
+			time.Sleep(10 * time.Second)
 		}
 	}()
 }

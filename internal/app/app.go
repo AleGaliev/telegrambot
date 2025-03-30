@@ -16,7 +16,6 @@ func AppRun(oldTime map[string][]string) (map[string][]string, string) {
 	changeTime = checknewdate.CheckNewDate(newTime, oldTime)
 	for key, value := range changeTime {
 		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании появилось свободное время время %v на дату %s", value, key))
-		fmt.Printf("Для Стефании появилось свободное время время %v на дату %s\n", value, key)
 	}
 	return newTime, message
 }
@@ -29,7 +28,6 @@ func AppRunNow() (map[string][]string, string) {
 	}
 	for key, value := range newTime {
 		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании есть свободное время время %v на дату %s", value, key))
-		fmt.Printf("Для Стефании есть есть время %v на дату %s\n", value, key)
 	}
 	return newTime, message
 }
@@ -43,5 +41,4 @@ func getInfo() map[string][]string {
 	newTime := dateinfo.TimeList(dateList, initTimeList)
 	newTime, _ = timefilter.TimeFilter(newTime, "", "")
 	return newTime
-
 }

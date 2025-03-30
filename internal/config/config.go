@@ -4,8 +4,8 @@ import "os"
 
 const (
 	locationId int = 578233
-	//staffId         int    = 2583227
-	staffId          int    = 3299357
+	staffId    int = 2583227
+	//staffId          int    = 3299357
 	serviceId        int    = 8441801
 	preficsTimeslots string = "timeslots"
 	preficsDates     string = "dates"

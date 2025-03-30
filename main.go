@@ -29,6 +29,7 @@ func main() {
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/hello", bot.MatchTypeExact, telegrambot.HelloHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/startsurvey", bot.MatchTypeExact, telegrambot.StartSurveyHandler)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "/stoptsurvey", bot.MatchTypeExact, telegrambot.StopSurveyHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/timenow", bot.MatchTypeExact, telegrambot.TimeNowHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/startinfo", bot.MatchTypeExact, telegrambot.StartInfoHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/stoptinfo", bot.MatchTypeExact, telegrambot.StopInfoHandler)

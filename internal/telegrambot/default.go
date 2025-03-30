@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	startMessage string = "/hello - тестовый запрос \n/timenow - узнать даты и время на запись у Стефании \n/startsurvey - запустить опросы \n/startinfo - запускает опрос для получения свободных слотов у Стефании \n/stoptinfo - останавливает опрос для получения свободных слотов у Стефании "
+	startMessage string = "/hello - тестовый запрос \n/timenow - узнать даты и время на запись у Стефании \n/startsurvey - запустить опросы \n/stoptsurvey - остановить запросы \n/startinfo - запускает опрос для получения свободных слотов у Стефании \n/stoptinfo - останавливает опрос для получения свободных слотов у Стефании "
 )
 
 func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {

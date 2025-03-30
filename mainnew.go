@@ -5,25 +5,36 @@ import (
 	"time"
 )
 
-func produce(numbers chan int) {
-	for num := range numbers { // Чтение данных из канала
-		fmt.Println("Получено:", num)
-	}
-	close(numbers) // Закрытие канала
+var (
+	StopChan = make(chan struct{})
+	name     string
+)
+
+func GorutineStart() {
+	go func() {
+
+		for {
+			select {
+			default:
+				message(name)
+			case <-StopChan:
+				// Останавливаем горутину
+				return
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
+}
+
+func message(msg string) {
+	fmt.Println(time.Now(), msg)
 }
 
 func main() {
-	numbers := make(chan int)
-
-	go produce(numbers) // Запуск производителя в горутине
-
-	for i := 0; i < 5; i++ {
-		numbers <- i
-		time.Sleep(2 * time.Second)
-	}
-	fmt.Println("test")
-	for i := 0; i < 5; i++ {
-		numbers <- i
-		time.Sleep(2 * time.Second)
+	go GorutineStart()
+	for {
+		fmt.Print("Введите имя: ")
+		fmt.Scan(&name)
+		time.Sleep(11 * time.Second)
 	}
 }
