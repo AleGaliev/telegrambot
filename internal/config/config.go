@@ -10,6 +10,7 @@ const (
 	preficsTimeslots string = "timeslots"
 	preficsDates     string = "dates"
 	baseUrl          string = "https://b611880.yclients.com/api/v1/booking/search"
+	keyDBAdr         string = "localhost:6375"
 )
 
 type AppConfig struct {
@@ -20,6 +21,7 @@ type AppConfig struct {
 	PreficsTimeslots string
 	PreficsDates     string
 	HeaderAuth       string
+	KeyDB            string
 }
 
 func NewAppConfig() AppConfig {
@@ -30,7 +32,7 @@ func NewAppConfig() AppConfig {
 		BaseUrl:          baseUrl,
 		PreficsTimeslots: preficsTimeslots,
 		PreficsDates:     preficsDates,
-		//HeaderAuth:       HeaderAuth,
-		HeaderAuth: os.Getenv("HEADER_AUTH"),
+		KeyDB:            os.Getenv("KEY_DB_ADR"),
+		HeaderAuth:       os.Getenv("HEADER_AUTH"),
 	}
 }

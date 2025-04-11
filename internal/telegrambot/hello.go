@@ -14,5 +14,4 @@ func HelloHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		ParseMode: models.ParseModeMarkdown,
 	})
 	loging.LogMessage(update.Message.Chat.ID, bot.EscapeMarkdown(update.Message.From.FirstName), "Hello, *"+bot.EscapeMarkdown(update.Message.From.FirstName)+"*")
-
 }

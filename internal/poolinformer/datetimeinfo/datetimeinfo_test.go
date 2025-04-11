@@ -1,4 +1,4 @@
-package dateinfo_test
+package datetimeinfo_test
 
 import (
 	"botinfotime/internal/dateinfo"

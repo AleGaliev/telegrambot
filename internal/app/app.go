@@ -1,44 +1,51 @@
 package app
 
 import (
-	"botinfotime/internal/checknewdate"
 	"botinfotime/internal/config"
-	"botinfotime/internal/dateinfo"
-	"botinfotime/internal/preparation"
-	"botinfotime/internal/timefilter"
+	"botinfotime/internal/poolinformer/checknewdate"
+	"botinfotime/internal/poolinformer/datetimeinfo"
 	"fmt"
 )
 
-func AppRun(oldTime map[string][]string) (map[string][]string, string) {
-	changeTime := make(map[string][]string)
-	var message string
-	newTime := getInfo()
-	changeTime = checknewdate.CheckNewDate(newTime, oldTime)
-	for key, value := range changeTime {
-		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании появилось свободное время время %v на дату %s", value, key))
+var (
+	OldTime map[string][]string = make(map[string][]string)
+)
+
+func RunGetTimeNow(appConfig config.AppConfig) (string, map[string][]string, error) {
+	dataInfo := datetimeinfo.InitDateTimeInfo(appConfig)
+	dataList, err := dataInfo.GetDateFree()
+	if err != nil {
+		return "", nil, err
 	}
-	return newTime, message
+	dataTime, err := dataInfo.GetTimeFree(dataList)
+	if err != nil {
+		return "", nil, err
+	}
+	var message string
+	for data, time := range dataTime {
+		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании появилось свободное время время %v на дату %s", time, data))
+	}
+	if len(message) == 0 {
+		return "К сожалении у Стефании нет свободного времени на запись", nil, nil
+	}
+	return message, nil, nil
 }
 
-func AppRunNow() (map[string][]string, string) {
+func RunGetChangeTime(appConfig config.AppConfig) (string, map[string][]string, error) {
+	dataInfo := datetimeinfo.InitDateTimeInfo(appConfig)
+	dataList, err := dataInfo.GetDateFree()
+	if err != nil {
+		return "", nil, err
+	}
+	dataTime, err := dataInfo.GetTimeFree(dataList)
+	if err != nil {
+		return "", nil, err
+	}
+	changeTime := checknewdate.CheckNewDate(dataTime, OldTime)
+	OldTime = dataTime
 	var message string
-	newTime := getInfo()
-	if len(newTime) == 0 {
-		return newTime, "К сожалении у Стефании нет свободного времени на запись"
+	for data, time := range changeTime {
+		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании появилось свободное время время %v на дату %s", time, data))
 	}
-	for key, value := range newTime {
-		message = fmt.Sprintf("%v\n%v", message, fmt.Sprintf("Для Стефании есть свободное время время %v на дату %s", value, key))
-	}
-	return newTime, message
-}
-
-func getInfo() map[string][]string {
-	appConf := config.NewAppConfig()
-	configPayload := preparation.InitConfigPayload(appConf.HeaderAuth, appConf.BaseUrl)
-	initTimeList := dateinfo.InitTimeList(configPayload, appConf)
-	responseDateFree, _ := dateinfo.GetDateFree(configPayload, initTimeList)
-	dateList := dateinfo.DateList(responseDateFree)
-	newTime := dateinfo.TimeList(dateList, initTimeList)
-	newTime, _ = timefilter.TimeFilter(newTime, "", "")
-	return newTime
+	return message, changeTime, nil
 }

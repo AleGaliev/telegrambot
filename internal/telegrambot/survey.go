@@ -2,6 +2,8 @@ package telegrambot
 
 import (
 	"botinfotime/internal/app"
+	"botinfotime/internal/config"
+	"botinfotime/internal/keydb"
 	"botinfotime/internal/loging"
 	"context"
 	"fmt"
@@ -10,9 +12,9 @@ import (
 )
 
 var (
-	userRights  []int64       = []int64{224268678, 211348295}
-	StopChan    chan struct{} = nil
-	StartSurvey bool          = false
+	userRights  []int64 = []int64{224268678, 211348295}
+	StartSurvey bool    = true
+	StopChan            = make(chan struct{})
 )
 
 func StartSurveyHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -41,9 +43,9 @@ func StartSurveyHandler(ctx context.Context, b *bot.Bot, update *models.Update) 
 	StartSurvey = true
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: chatID,
-		Text:   "Запущен опрос свободного времени с Стефании с переодичностью 20 минут .",
+		Text:   "Запущен опрос свободного времени с Стефании с периодичностью 10 минут .",
 	})
-	loging.LogMessage(chatID, update.Message.From.FirstName, "Запущен опрос свободного времени с Стефании с переодичностью 20 минут .")
+	loging.LogMessage(chatID, update.Message.From.FirstName, "Запущен опрос свободного времени с Стефании с периодичностью ]0 минут .")
 }
 
 func StopSurveyHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -61,9 +63,9 @@ func StopSurveyHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if StartSurvey == false {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
-			Text:   "Получение информации о времени у Стефании остановлено.",
+			Text:   "Опрос свободного времени у Стефании остановлен",
 		})
-		loging.LogMessage(chatID, update.Message.From.FirstName, "Получение информации о времени у Стефании остановлено.")
+		loging.LogMessage(chatID, update.Message.From.FirstName, "Опрос свободного времени у Стефании остановлен")
 		return
 	}
 
@@ -88,20 +90,27 @@ func checkUserRights(chatID int64) bool {
 	return check
 }
 
-func SendBroadcastMessage(ctx context.Context, b *bot.Bot, listSurrveyUser map[int64]string) {
-	var message string
-	OldTime, message = app.AppRun(OldTime)
-	OldTime = make(map[string][]string)
+func SendBroadcastMessage(ctx context.Context, b *bot.Bot, appConfig config.AppConfig) {
+	message, _, err := app.RunGetChangeTime(appConfig)
+	if err != nil {
+		SendErrMessage(ctx, b, err)
+	}
+
 	if message != "" {
-		for chatID, firstName := range listSurrveyUser {
+		KeyDbConfig := keydb.InitKeyDb(appConfig.KeyDB)
+		listSurrveyUser, err := KeyDbConfig.GetValueKeyDb(ctx, "ListChat")
+		if err != nil {
+			SendErrMessage(ctx, b, err)
+		}
+		for _, survey := range listSurrveyUser.Surveys {
 			_, err := b.SendMessage(ctx, &bot.SendMessageParams{
-				ChatID: chatID,
+				ChatID: survey.ChatId,
 				Text:   message,
 			})
 			if err != nil {
 				fmt.Printf("Ошибка при отправке сообщения: %v\n", err)
 			} else {
-				loging.LogMessage(chatID, firstName, message)
+				loging.LogMessage(survey.ChatId, survey.FirstName, message)
 			}
 		}
 	}
